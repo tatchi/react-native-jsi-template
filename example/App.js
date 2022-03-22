@@ -5,6 +5,7 @@ import simpleJsiModule, {isLoaded} from 'react-native-jsi-template';
 export default function App() {
   const [result, setResult] = React.useState();
   const [deviceName, setDeviceName] = React.useState();
+  const [orientation, setOrientation] = React.useState();
   const [getItemValue, setGetItemValue] = React.useState();
 
   React.useEffect(() => {
@@ -23,6 +24,39 @@ export default function App() {
         }}
         style={styles.button}>
         <Text style={styles.buttonTxt}>Device Name: {deviceName}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
+          let value = simpleJsiModule.getCurrentOrientation();
+          setOrientation(value);
+        }}
+        style={styles.button}>
+        <Text style={styles.buttonTxt}>Orientation: {orientation}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
+          simpleJsiModule.lockToPortrait();
+        }}
+        style={styles.button}>
+        <Text style={styles.buttonTxt}>Lock Portrait</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
+          simpleJsiModule.lockToLandscape();
+        }}
+        style={styles.button}>
+        <Text style={styles.buttonTxt}>Lock Landscape</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
+          simpleJsiModule.activateListener();
+        }}
+        style={styles.button}>
+        <Text style={styles.buttonTxt}>Activate Listener</Text>
       </TouchableOpacity>
 
       <TouchableOpacity

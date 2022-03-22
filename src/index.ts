@@ -16,6 +16,10 @@ const simpleJsiModule: {
   ): void;
   multiply(x: number, y: number): number;
   getDeviceName(): string;
+  getCurrentOrientation(): string;
+  lockToLandscape(): void;
+  lockToPortrait(): void;
+  activateListener(): void;
   setItem(key: string, value: string): boolean;
   getItem(key: string): string;
   //@ts-ignore
