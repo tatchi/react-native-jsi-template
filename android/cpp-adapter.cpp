@@ -1,16 +1,26 @@
 #include <jni.h>
 #include <sys/types.h>
-#include "example.h"
 #include "pthread.h"
 #include <jsi/jsi.h>
 #include <android/log.h>
+#include "example.h"
 
-using namespace facebook::jsi;
+#include <fbjni/fbjni.h>
+#include <ReactCommon/CallInvokerHolder.h>
+#include <ReactCommon/CallInvoker.h>
+
+#include <jsi/jsilib.h>
+
 using namespace std;
+using namespace facebook;
+using namespace facebook::jsi;
 
 JavaVM *java_vm;
 jclass java_class;
 jobject java_object;
+
+//string docPathStr;
+std::shared_ptr<react::CallInvoker> invoker;
 
 /**
  * A simple callback function that allows us to detach current JNI Environment
@@ -91,7 +101,10 @@ Java_com_reactnativesimplejsi_SimpleJsiModule_callValue(JNIEnv *env, jclass claz
 
 
 
-void install(facebook::jsi::Runtime &jsiRuntime) {
+void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> jsCallInvoker){
+//  docPathStr = std::string(docPath);
+//   auto pool = std::make_shared<ThreadPool>();
+  invoker = jsCallInvoker;
 
     auto getDeviceName = Function::createFromHostFunction(jsiRuntime,
                                                           PropNameID::forAscii(jsiRuntime,
@@ -307,15 +320,26 @@ void install(facebook::jsi::Runtime &jsiRuntime) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_reactnativesimplejsi_SimpleJsiModule_nativeInstall(JNIEnv *env, jobject thiz, jlong jsi) {
+Java_com_reactnativesimplejsi_SimpleJsiModule_nativeInstall(JNIEnv *env, jobject thiz,
+                               jlong jsiRuntimePtr,
+                               jobject boxedCallInvokerHolder) {
 
-    auto runtime = reinterpret_cast<facebook::jsi::Runtime *>(jsi);
+    auto jsiRuntime = reinterpret_cast<jsi::Runtime *>(jsiRuntimePtr);
 
-    if (runtime) {
-        example::install(*runtime);
-        install(*runtime);
+
+    auto boxedCallInvokerRef = jni::make_local(boxedCallInvokerHolder);
+    auto callInvokerHolder = jni::dynamic_ref_cast<react::CallInvokerHolder::javaobject>(boxedCallInvokerRef);
+    auto jsCallInvoker = callInvokerHolder->cthis()->getCallInvoker();
+    if (jsiRuntime) {
+        example::install(*jsiRuntime);
+        install(*jsiRuntime, jsCallInvoker);
     }
-
+    // TODO: needed?
     env->GetJavaVM(&java_vm);
     java_object = env->NewGlobalRef(thiz);
+}
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
+    return facebook::jni::initialize(vm, [] {
+    });
 }

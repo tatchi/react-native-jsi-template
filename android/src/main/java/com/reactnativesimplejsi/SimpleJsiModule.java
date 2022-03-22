@@ -17,9 +17,12 @@ import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.JavaScriptContextHolder;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.bridge.ReactMethod;
+
+import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 
 
 @ReactModule(name = SimpleJsiModule.NAME)
@@ -38,7 +41,7 @@ public class SimpleJsiModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
-  private native void nativeInstall(long jsi);
+  private native void nativeInstall(long jsContextNativePointer, CallInvokerHolderImpl jsCallInvokerHolder);
 
   public static native int callValue(int param);
 
@@ -48,11 +51,14 @@ public class SimpleJsiModule extends ReactContextBaseJavaModule {
   public boolean install() {
 
     System.loadLibrary("cpp");
-    JavaScriptContextHolder jsContext = getReactApplicationContext().getJavaScriptContextHolder();
+    ReactContext context = getReactApplicationContext();
+    JavaScriptContextHolder jsContext = context.getJavaScriptContextHolder();
+    CallInvokerHolderImpl jsCallInvokerHolder = (CallInvokerHolderImpl)context.getCatalystInstance().getJSCallInvokerHolder();
 
     if (jsContext != null) {
       this.nativeInstall(
-        jsContext.get()
+        jsContext.get(),
+        jsCallInvokerHolder
       );
       return true;
     } else {
