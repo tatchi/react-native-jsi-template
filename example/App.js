@@ -53,7 +53,10 @@ export default function App() {
 
       <TouchableOpacity
         onPress={() => {
-          simpleJsiModule.activateListener();
+          simpleJsiModule.activateListener(res => {
+            console.log({res});
+            console.log('RECEIVED ORIENTATION CHANGE LOL');
+          });
         }}
         style={styles.button}>
         <Text style={styles.buttonTxt}>Activate Listener</Text>

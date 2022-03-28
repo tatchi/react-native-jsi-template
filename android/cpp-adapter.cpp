@@ -19,8 +19,7 @@ JavaVM *java_vm;
 jclass java_class;
 jobject java_object;
 
-//string docPathStr;
-std::shared_ptr<react::CallInvoker> invoker;
+
 
 /**
  * A simple callback function that allows us to detach current JNI Environment
@@ -93,8 +92,29 @@ static jstring string2jstring(JNIEnv *env, const string &str) {
     return (*env).NewStringUTF(str.c_str());
 }
 
+std::shared_ptr<facebook::jsi::Function> jsCallback = NULL;
+std::shared_ptr<react::CallInvoker> invoker;
+
+jsi::Runtime *rt;
+
 extern "C" JNIEXPORT int JNICALL
 Java_com_reactnativesimplejsi_SimpleJsiModule_callValue(JNIEnv *env, jclass clazz, jint param) {
+
+    __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "callValue got called in C++");
+
+        invoker->invokeAsync([=](){
+            __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "in invoke async");
+            if(jsCallback == NULL){
+                __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "jsCallback is null!!");
+            }else {
+//                auto jsiRuntime = reinterpret_cast<jsi::Runtime *>(jsiRuntimePtr);
+                __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "jsCallback is not null!!");
+            jsCallback->call(*rt, jsi::Value(param));
+
+}
+        });
+
+
     int result = param + 10;
     return result;
 }
@@ -105,6 +125,7 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
 //  docPathStr = std::string(docPath);
 //   auto pool = std::make_shared<ThreadPool>();
   invoker = jsCallInvoker;
+  rt = &jsiRuntime;
 
     auto getDeviceName = Function::createFromHostFunction(jsiRuntime,
                                                           PropNameID::forAscii(jsiRuntime,
@@ -211,7 +232,7 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
     auto activateListener = Function::createFromHostFunction(jsiRuntime,
                                                           PropNameID::forAscii(jsiRuntime,
                                                                                "activateListener"),
-                                                          0,
+                                                          1,
                                                           [](Runtime &runtime,
                                                              const Value &thisValue,
                                                              const Value *arguments,
@@ -219,6 +240,9 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
 
 
                                                               __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "IN activateListener from C++");
+
+                                                              auto callback = arguments[0].asObject(runtime).asFunction(runtime);
+                                                              jsCallback = std::make_shared<jsi::Function>(std::move(callback));
 
                                                               JNIEnv *jniEnv = GetJniEnv();
 
@@ -229,7 +253,7 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
                                                                       "()V");
                                                               jniEnv->CallVoidMethod(
                                                                       java_object, activateListener);
-                                                              return Value();
+                                                              return Value::undefined();
                                                           });
 
     jsiRuntime.global().setProperty(jsiRuntime, "activateListener", move(activateListener));
