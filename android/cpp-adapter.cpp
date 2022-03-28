@@ -253,7 +253,11 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
                                                                       "()V");
                                                               jniEnv->CallVoidMethod(
                                                                       java_object, activateListener);
-                                                              return Value::undefined();
+
+                                                              auto close = [] (jsi::Runtime& runtime, const jsi::Value&, const jsi::Value*, size_t) -> jsi::Value {
+                                                                  return jsi::String::createFromUtf8(runtime, "CLOSED!");
+                                                              };
+                                                              return jsi::Function::createFromHostFunction(runtime, jsi::PropNameID::forUtf8(runtime, "close"), 0, close);
                                                           });
 
     jsiRuntime.global().setProperty(jsiRuntime, "activateListener", move(activateListener));
@@ -349,7 +353,6 @@ Java_com_reactnativesimplejsi_SimpleJsiModule_nativeInstall(JNIEnv *env, jobject
                                jobject boxedCallInvokerHolder) {
 
     auto jsiRuntime = reinterpret_cast<jsi::Runtime *>(jsiRuntimePtr);
-
 
     auto boxedCallInvokerRef = jni::make_local(boxedCallInvokerHolder);
     auto callInvokerHolder = jni::dynamic_ref_cast<react::CallInvokerHolder::javaobject>(boxedCallInvokerRef);
