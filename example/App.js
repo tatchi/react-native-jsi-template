@@ -8,8 +8,20 @@ export default function App() {
   const [orientation, setOrientation] = React.useState();
   const [getItemValue, setGetItemValue] = React.useState();
 
+  const unregister1 = React.useRef();
+  const unregister2 = React.useRef();
+
   React.useEffect(() => {
     setResult(simpleJsiModule.helloWorld());
+  }, []);
+
+  React.useEffect(() => {
+    unregister1.current = simpleJsiModule.activateListener(res => {
+      console.log({first: res});
+    });
+    unregister2.current = simpleJsiModule.activateListener(res => {
+      console.log({second: res});
+    });
   }, []);
 
   return (
@@ -53,14 +65,17 @@ export default function App() {
 
       <TouchableOpacity
         onPress={() => {
-          const unregister = simpleJsiModule.activateListener(res => {
-            console.log({res});
-            console.log('RECEIVED ORIENTATION CHANGE LOL');
-          });
-          console.log(unregister());
+          unregister1.current();
         }}
         style={styles.button}>
-        <Text style={styles.buttonTxt}>Activate Listener</Text>
+        <Text style={styles.buttonTxt}>Unregister Listener 1</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          unregister2.current();
+        }}
+        style={styles.button}>
+        <Text style={styles.buttonTxt}>Unregister Listener 2.</Text>
       </TouchableOpacity>
 
       <TouchableOpacity

@@ -92,7 +92,7 @@ static jstring string2jstring(JNIEnv *env, const string &str) {
     return (*env).NewStringUTF(str.c_str());
 }
 
-std::shared_ptr<facebook::jsi::Function> jsCallback = NULL;
+std::vector<std::shared_ptr<facebook::jsi::Function>> jsCallbacks;
 std::shared_ptr<react::CallInvoker> invoker;
 
 jsi::Runtime *rt;
@@ -103,15 +103,11 @@ Java_com_reactnativesimplejsi_SimpleJsiModule_callValue(JNIEnv *env, jclass claz
     __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "callValue got called in C++");
 
         invoker->invokeAsync([=](){
-            __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "in invoke async");
-            if(jsCallback == NULL){
-                __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "jsCallback is null!!");
-            }else {
-//                auto jsiRuntime = reinterpret_cast<jsi::Runtime *>(jsiRuntimePtr);
-                __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "jsCallback is not null!!");
-            jsCallback->call(*rt, jsi::Value(param));
-
-}
+            __android_log_print(ANDROID_LOG_INFO, "COCO TAG", "in invoke async, nb: %d", jsCallbacks.size());
+            for(auto & elem : jsCallbacks)
+            {
+                elem->call(*rt, jsi::Value(param));
+            }
         });
 
 
@@ -242,7 +238,8 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
                                                               __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "IN activateListener from C++");
 
                                                               auto callback = arguments[0].asObject(runtime).asFunction(runtime);
-                                                              jsCallback = std::make_shared<jsi::Function>(std::move(callback));
+                                                              auto jsCallback = std::make_shared<jsi::Function>(std::move(callback));
+                                                              jsCallbacks.push_back(jsCallback);
 
                                                               JNIEnv *jniEnv = GetJniEnv();
 
@@ -254,8 +251,23 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
                                                               jniEnv->CallVoidMethod(
                                                                       java_object, activateListener);
 
-                                                              auto close = [] (jsi::Runtime& runtime, const jsi::Value&, const jsi::Value*, size_t) -> jsi::Value {
-                                                                  return jsi::String::createFromUtf8(runtime, "CLOSED!");
+                                                              auto close = [jsCallback] (jsi::Runtime& runtime, const jsi::Value&, const jsi::Value*, size_t) -> jsi::Value {
+
+                                                                   auto it = std::find(jsCallbacks.begin(), jsCallbacks.end(), jsCallback);
+
+                                                                     // If element was found
+                                                                     if (it != jsCallbacks.end())
+                                                                     {
+                                                                         __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "FOUND CALLBACK %i");
+                                                                         auto index = it - jsCallbacks.begin();
+                                                                         jsCallbacks.erase(jsCallbacks.begin()+index);
+                                                                     }else {
+                                                                         __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "CALLBACK NOT FOUND");
+                                                                     }
+
+
+
+                                                                  return jsi::Value::undefined();
                                                               };
                                                               return jsi::Function::createFromHostFunction(runtime, jsi::PropNameID::forUtf8(runtime, "close"), 0, close);
                                                           });
