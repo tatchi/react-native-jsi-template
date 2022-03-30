@@ -1,46 +1,32 @@
 import * as React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
-import simpleJsiModule, {isLoaded} from 'react-native-jsi-template';
+import Orientation from 'react-native-jsi-orientation-locker';
 
 export default function App() {
-  const [result, setResult] = React.useState();
-  const [deviceName, setDeviceName] = React.useState();
   const [orientation, setOrientation] = React.useState();
-  const [getItemValue, setGetItemValue] = React.useState();
+  const [currentOrientation, setCurrentOrientation] = React.useState(() =>
+    Orientation.getCurrentOrientation(),
+  );
 
   const unregister1 = React.useRef();
   const unregister2 = React.useRef();
 
   React.useEffect(() => {
-    setResult(simpleJsiModule.helloWorld());
-  }, []);
-
-  React.useEffect(() => {
-    unregister1.current = simpleJsiModule.activateListener(res => {
-      console.log({first: res});
+    unregister1.current = Orientation.activateListener(orientation => {
+      console.log({first: orientation});
+      setCurrentOrientation(orientation);
     });
-    unregister2.current = simpleJsiModule.activateListener(res => {
+    unregister2.current = Orientation.activateListener(res => {
       console.log({second: res});
     });
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Bindings Installed: {isLoaded().toString()}</Text>
-      <Text>Result: {result}</Text>
-
+      <Text>Current Orientation: {currentOrientation}</Text>
       <TouchableOpacity
         onPress={() => {
-          let value = simpleJsiModule.getDeviceName();
-          setDeviceName(value);
-        }}
-        style={styles.button}>
-        <Text style={styles.buttonTxt}>Device Name: {deviceName}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          let value = simpleJsiModule.getCurrentOrientation();
+          let value = Orientation.getCurrentOrientation();
           setOrientation(value);
         }}
         style={styles.button}>
@@ -49,7 +35,7 @@ export default function App() {
 
       <TouchableOpacity
         onPress={() => {
-          simpleJsiModule.lockToPortrait();
+          Orientation.lockToPortrait();
         }}
         style={styles.button}>
         <Text style={styles.buttonTxt}>Lock Portrait</Text>
@@ -57,7 +43,7 @@ export default function App() {
 
       <TouchableOpacity
         onPress={() => {
-          simpleJsiModule.lockToLandscape();
+          Orientation.lockToLandscape();
         }}
         style={styles.button}>
         <Text style={styles.buttonTxt}>Lock Landscape</Text>
@@ -76,22 +62,6 @@ export default function App() {
         }}
         style={styles.button}>
         <Text style={styles.buttonTxt}>Unregister Listener 2.</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          simpleJsiModule.setItem('helloworld', 'Hello World');
-        }}
-        style={styles.button}>
-        <Text style={styles.buttonTxt}>setItem: "Hello World"</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          setGetItemValue(simpleJsiModule.getItem('helloworld'));
-        }}
-        style={styles.button}>
-        <Text style={styles.buttonTxt}>getItem: {getItemValue}</Text>
       </TouchableOpacity>
     </View>
   );

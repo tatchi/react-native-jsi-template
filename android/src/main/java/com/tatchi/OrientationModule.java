@@ -1,4 +1,4 @@
-package com.reactnativesimplejsi;
+package com.tatchi.orientation;
 
 import android.app.Activity;
 import android.content.Context;
@@ -25,13 +25,13 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 
 
-@ReactModule(name = SimpleJsiModule.NAME)
-public class SimpleJsiModule extends ReactContextBaseJavaModule {
-  public static final String NAME = "SimpleJsi";
+@ReactModule(name = OrientationModule.NAME)
+public class OrientationModule extends ReactContextBaseJavaModule {
+  public static final String NAME = "Orientation";
   private OrientationEventListener mOrientationListener;
 
 
-  public SimpleJsiModule(ReactApplicationContext reactContext) {
+  public OrientationModule(ReactApplicationContext reactContext) {
     super(reactContext);
   }
 
@@ -62,7 +62,7 @@ public class SimpleJsiModule extends ReactContextBaseJavaModule {
       );
       return true;
     } else {
-      Log.e("SimpleJsiModule", "JSI Runtime is not available in debug mode");
+      Log.e("OrientationModule", "JSI Runtime is not available in debug mode");
       return false;
     }
 

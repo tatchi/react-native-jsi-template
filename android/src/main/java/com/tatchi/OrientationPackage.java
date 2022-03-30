@@ -1,4 +1,4 @@
-package com.reactnativesimplejsi;
+package com.tatchi.orientation;
 
 import androidx.annotation.NonNull;
 
@@ -13,11 +13,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleJsiPackage implements ReactPackage {
+public class OrientationPackage implements ReactPackage {
   @NonNull
   @Override
   public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
-    return Collections.singletonList(new SimpleJsiModule(reactContext));
+    return Collections.singletonList(new OrientationModule(reactContext));
   }
 
   @NonNull

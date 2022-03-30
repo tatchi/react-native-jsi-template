@@ -25,7 +25,6 @@ include_directories(
 add_library(
         ${PACKAGE_NAME}  # <-- Library name
         SHARED
-        ../cpp/example.cpp
         ./cpp-adapter.cpp
 )
 

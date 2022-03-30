@@ -3,7 +3,6 @@
 #include "pthread.h"
 #include <jsi/jsi.h>
 #include <android/log.h>
-#include "example.h"
 
 #include <fbjni/fbjni.h>
 #include <ReactCommon/CallInvokerHolder.h>
@@ -98,7 +97,7 @@ std::shared_ptr<react::CallInvoker> invoker;
 jsi::Runtime *rt;
 
 extern "C" JNIEXPORT int JNICALL
-Java_com_reactnativesimplejsi_SimpleJsiModule_callValue(JNIEnv *env, jclass clazz, jint param) {
+Java_com_tatchi_orientation_OrientationModule_callValue(JNIEnv *env, jclass clazz, jint param) {
 
     __android_log_write(ANDROID_LOG_INFO, "COCO TAG", "callValue got called in C++");
 
@@ -360,7 +359,7 @@ void install(facebook::jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvo
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_reactnativesimplejsi_SimpleJsiModule_nativeInstall(JNIEnv *env, jobject thiz,
+Java_com_tatchi_orientation_OrientationModule_nativeInstall(JNIEnv *env, jobject thiz,
                                jlong jsiRuntimePtr,
                                jobject boxedCallInvokerHolder) {
 
@@ -370,7 +369,6 @@ Java_com_reactnativesimplejsi_SimpleJsiModule_nativeInstall(JNIEnv *env, jobject
     auto callInvokerHolder = jni::dynamic_ref_cast<react::CallInvokerHolder::javaobject>(boxedCallInvokerRef);
     auto jsCallInvoker = callInvokerHolder->cthis()->getCallInvoker();
     if (jsiRuntime) {
-        example::install(*jsiRuntime);
         install(*jsiRuntime, jsCallInvoker);
     }
     // TODO: needed?

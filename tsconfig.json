@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "react-native-simple-jsi": ["./src/index"]
+      "react-native-jsi-orientation-locker": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

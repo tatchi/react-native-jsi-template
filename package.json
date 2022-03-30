@@ -1,5 +1,5 @@
 {
-  "name": "react-native-jsi-template",
+  "name": "react-native-jsi-orientation-locker",
   "version": "0.3.0",
   "description": "How to build a jsi module example library",
   "main": "./src/index.ts",
@@ -9,7 +9,7 @@
     "android",
     "ios",
     "cpp",
-    "react-native-jsi-template.podspec",
+    "react-native-jsi-orientation-locker.podspec",
     "!lib/typescript/example",
     "!android/build",
     "!ios/build",
@@ -32,13 +32,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/ammarahm-ed/react-native-jsi-template",
-  "author": "ammarahm-ed <ammarahmed6506@gmail.com> (https://github.com/ammarahm-ed)",
+  "repository": "https://github.com/tatchi/react-native-jsi-orientation-locker",
+  "author": "Corentin Leruth (https://github.com/tatchi)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ammarahm-ed/react-native-jsi-template/issues"
+    "url": "https://github.com/tatchi/react-native-jsi-orientation-locker/issues"
   },
-  "homepage": "https://github.com/ammarahm-ed/react-native-jsi-template#readme",
+  "homepage": "https://github.com/tatchi/react-native-jsi-orientation-locker#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

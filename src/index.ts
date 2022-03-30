@@ -3,40 +3,22 @@
 // Maybe there is a better way to do this.
 import { NativeModules } from 'react-native';
 
-// Installing JSI Bindings as done by
-// https://github.com/mrousavy/react-native-mmkv
+const OrientationNativeModule = NativeModules.Orientation;
+
+if (OrientationNativeModule) {
+  if (typeof OrientationNativeModule.install === 'function') {
+    OrientationNativeModule.install();
+  }
+}
 
 //@ts-ignore
-const simpleJsiModule: {
-  helloWorld(): string;
-  multiplyWithCallback(
-    x: number,
-    y: number,
-    callback: (z: number) => void
-  ): void;
-  multiply(x: number, y: number): number;
-  getDeviceName(): string;
+const orientationModule: {
   getCurrentOrientation(): string;
   lockToLandscape(): void;
   lockToPortrait(): void;
   activateListener(): void;
   setItem(key: string, value: string): boolean;
   getItem(key: string): string;
-  //@ts-ignore
 } = global;
 
-export function isLoaded() {
-  return typeof simpleJsiModule.getItem === 'function';
-}
-
-if (!isLoaded()) {
-  const result = NativeModules.SimpleJsi.install();
-  if (!result)
-    throw new Error('JSI bindings were not installed for: SimpleJsi Module');
-
-  if (!isLoaded()) {
-    throw new Error('JSI bindings were not installed for: SimpleJsi Module');
-  }
-}
-
-export default simpleJsiModule;
+export default orientationModule;
